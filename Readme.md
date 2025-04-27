@@ -22,7 +22,7 @@ This project contains a simple, from-scratch implementation of a **Doubly Linked
 - Each node holds:
   - A value
   - A link to the next node (`Option<Rc<RefCell<Node>>>`)
-  - A link to the previous node (using raw pointers or `Option<Rc<Weak<Node>>>`, depending on implementation)
+  - A link to the previous node (using raw pointers or `Option<Weak<RefCell<Node>>>`, depending on implementation)
 - The list keeps track of:
   - The head node
   - The tail node
