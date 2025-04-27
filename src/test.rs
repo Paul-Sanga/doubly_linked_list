@@ -8,8 +8,8 @@ fn test_add_first(){
     list.add_first(6);
     list.add_first(7);
     assert_eq!(list.size(), 3);
-    assert_eq!(list.head(), Some(Rc::new(7)));
-    assert_eq!(list.tail(), Some(Rc::new(5)));
+    assert_eq!(list.head(), Some(7));
+    assert_eq!(list.tail(), Some(5));
 }
 
 #[test]
@@ -19,8 +19,8 @@ fn test_add_last(){
     list.add_last(6);
     list.add_last(7);
     list.add_last(8);
-    assert_eq!(list.head(), Some(Rc::new(5)));
-    assert_eq!(list.tail(), Some(Rc::new(8)));
+    assert_eq!(list.head(), Some(5));
+    assert_eq!(list.tail(), Some(8));
     assert_eq!(list.size(), 4);
 }
 
@@ -33,8 +33,8 @@ fn test_remove_first(){
     list.add_last(8);
     list.remove_first().unwrap();
     list.remove_first().unwrap();
-    assert_eq!(list.head(), Some(Rc::new(7)));
-    assert_eq!(list.tail(), Some(Rc::new(8)));
+    assert_eq!(list.head(), Some(7));
+    assert_eq!(list.tail(), Some(8));
     assert_eq!(list.size, 2);
     list.remove_first().unwrap();
     list.remove_first().unwrap();

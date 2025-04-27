@@ -29,25 +29,13 @@ impl DoublyLinkedList {
         Self { size: 0, head: None, tail: None }
     }
 
-    pub fn head(&mut self)->Option<Rc<u32>>{
-        if let Some(head) = self.head.take(){
-            let value = Rc::new(head.borrow().value);
-            self.head = Some(head);
-            return Some(value);
-        }else{
-            return None;
-        }
+    pub fn head(&mut self)->Option<u32>{
+        self.head.as_ref().map(|head| head.borrow().value)
     }
 
-    pub fn tail(&mut self) -> Option<Rc<u32>>{
+    pub fn tail(&mut self) -> Option<u32>{
         if let Some(tail) = self.tail.take(){
-            if let Some(tail) = tail.upgrade(){
-                let value = Rc::new(tail.borrow().value);
-                self.tail = Some(Rc::downgrade(&tail));
-                return Some(value);
-            }else {
-                return None;
-            }
+            tail.upgrade().as_ref().map(|tail| tail.borrow().value)
         }else{
             return None;
         }
