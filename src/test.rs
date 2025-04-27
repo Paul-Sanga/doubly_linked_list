@@ -2,7 +2,7 @@
 use super::*;
 
 #[test]
-fn test_add_first(){
+fn test_add_first() {
     let mut list = DoublyLinkedList::new();
     list.add_first(5);
     list.add_first(6);
@@ -13,7 +13,7 @@ fn test_add_first(){
 }
 
 #[test]
-fn test_add_last(){
+fn test_add_last() {
     let mut list = DoublyLinkedList::new();
     list.add_last(5);
     list.add_last(6);
@@ -25,7 +25,7 @@ fn test_add_last(){
 }
 
 #[test]
-fn test_remove_first(){
+fn test_remove_first() {
     let mut list = DoublyLinkedList::new();
     list.add_last(5);
     list.add_last(6);
@@ -41,5 +41,8 @@ fn test_remove_first(){
     assert_eq!(list.size(), 0);
     assert_eq!(list.head(), None);
     assert_eq!(list.tail(), None);
-    assert_eq!(list.remove_first(), Err("Can not remove from an empty list".to_string()))
+    assert_eq!(
+        list.remove_first(),
+        Err("Can not remove from an empty list".to_string())
+    )
 }
