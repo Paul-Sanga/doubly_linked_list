@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 use std::{
     cell::RefCell,
-    mem::take,
     rc::{Rc, Weak},
 };
 
@@ -40,11 +39,11 @@ impl DoublyLinkedList {
         }
     }
 
-    pub fn head(&mut self) -> Option<u32> {
+    pub fn head(&self) -> Option<u32> {
         self.head.as_ref().map(|head| head.borrow().value)
     }
 
-    pub fn tail(&mut self) -> Option<u32> {
+    pub fn tail(&self) -> Option<u32> {
         self.tail
             .as_ref()
             .and_then(|tail| tail.upgrade())
@@ -62,11 +61,11 @@ impl DoublyLinkedList {
             self.tail = Some(Rc::downgrade(&node));
             self.head = Some(node);
         } else {
-            if let Some(head) = self.head.take() {
+            self.head.as_ref().map(|head| {
                 node.borrow_mut().next = Some(Rc::clone(&head));
                 head.borrow_mut().prev = Some(Rc::downgrade(&node));
-                self.head = Some(node);
-            }
+            });
+            self.head = Some(node);
         }
 
         self.size += 1;
@@ -78,13 +77,11 @@ impl DoublyLinkedList {
             self.tail = Some(Rc::downgrade(&node));
             self.head = Some(node);
         } else {
-            if let Some(tail) = self.tail.take() {
-                if let Some(tail) = tail.upgrade() {
-                    node.borrow_mut().prev = Some(Rc::downgrade(&tail));
-                    tail.borrow_mut().next = Some(Rc::clone(&node));
-                    self.tail = Some(Rc::downgrade(&node));
-                }
-            }
+            self.tail.as_ref().and_then(|tail| tail.upgrade()).map(|tail|{
+                node.borrow_mut().prev = Some(Rc::downgrade(&tail));
+                tail.borrow_mut().next = Some(Rc::clone(&node))
+            });
+            self.tail = Some(Rc::downgrade(&node));
         }
         self.size += 1;
     }
