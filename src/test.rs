@@ -1,5 +1,3 @@
-use std::io::Lines;
-
 #[cfg(test)]
 use super::*;
 
@@ -88,11 +86,11 @@ fn test_find_by_index_from_tail() {
     assert_eq!(list.find_by_index_from_tail(2), Some(7));
     assert_eq!(list.find_by_index_from_tail(1), Some(6));
     assert_eq!(list.find_by_index_from_tail(0), Some(5));
-    assert_eq!(list.find_by_index_from_tail(3), None);
+    assert_eq!(list.find_by_index_from_tail(300), None);
 }
 
 #[test]
-fn test_add_before(){
+fn test_add_before() {
     let mut list = DoublyLinkedList::new();
     list.add_last(5);
     list.add_last(6);

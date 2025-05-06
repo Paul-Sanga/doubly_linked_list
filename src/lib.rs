@@ -155,26 +155,10 @@ impl DoublyLinkedList {
     }
 
     pub fn find_by_index_from_tail(&self, index: usize) -> Option<u32> {
-        let mut iteration = 0usize;
-        let mut current_opt = self.tail.clone();
-        while let Some(current_node) = current_opt.as_ref() {
-            if iteration == index {
-                return current_node
-                    .upgrade()
-                    .as_ref()
-                    .map(|node| node.borrow().value);
-            } else {
-                if let Some(current_node) = current_node.upgrade() {
-                    current_opt = current_node
-                        .borrow()
-                        .prev
-                        .as_ref()
-                        .and_then(|node| node.upgrade())
-                        .map(|node| Rc::downgrade(&node));
-                    iteration += 1
-                }
-            }
+        let mut current_opt = self.tail.as_ref()?.upgrade();
+        for _ in 0..index {
+            current_opt = current_opt?.borrow().prev.as_ref()?.upgrade();
         }
-        None
+        current_opt.map(|node| node.borrow().value)
     }
 }
