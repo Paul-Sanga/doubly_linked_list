@@ -1,20 +1,21 @@
 #![allow(dead_code)]
 use std::{
     cell::RefCell,
+    fmt::{Debug, Display},
     rc::{Rc, Weak},
 };
 
 mod test;
 
 #[derive(Debug)]
-pub struct Node {
-    value: u32,
-    next: Option<Rc<RefCell<Node>>>,
-    prev: Option<Weak<RefCell<Node>>>,
+pub struct Node<T> {
+    value: T,
+    next: Option<Rc<RefCell<Node<T>>>>,
+    prev: Option<Weak<RefCell<Node<T>>>>,
 }
 
-impl Node {
-    fn new(value: u32) -> Self {
+impl<T: Debug + Copy + Display + PartialEq + PartialOrd> Node<T> {
+    fn new(value: T) -> Self {
         Self {
             value,
             next: None,
@@ -24,13 +25,13 @@ impl Node {
 }
 
 #[derive(Debug)]
-pub struct DoublyLinkedList {
+pub struct DoublyLinkedList<T> {
     size: usize,
-    head: Option<Rc<RefCell<Node>>>,
-    tail: Option<Weak<RefCell<Node>>>,
+    head: Option<Rc<RefCell<Node<T>>>>,
+    tail: Option<Weak<RefCell<Node<T>>>>,
 }
 
-impl DoublyLinkedList {
+impl<T: Debug + Copy + Display + PartialEq + PartialOrd> DoublyLinkedList<T> {
     pub fn new() -> Self {
         Self {
             size: 0,
@@ -39,11 +40,11 @@ impl DoublyLinkedList {
         }
     }
 
-    pub fn head(&self) -> Option<u32> {
+    pub fn head(&self) -> Option<T> {
         self.head.as_ref().map(|head| head.borrow().value)
     }
 
-    pub fn tail(&self) -> Option<u32> {
+    pub fn tail(&self) -> Option<T> {
         self.tail
             .as_ref()
             .and_then(|tail| tail.upgrade())
@@ -54,7 +55,7 @@ impl DoublyLinkedList {
         self.size
     }
 
-    pub fn add_first(&mut self, value: u32) {
+    pub fn add_first(&mut self, value: T) {
         let node = Rc::new(RefCell::new(Node::new(value)));
 
         if self.size == 0 {
@@ -71,7 +72,7 @@ impl DoublyLinkedList {
         self.size += 1;
     }
 
-    pub fn add_last(&mut self, value: u32) {
+    pub fn add_last(&mut self, value: T) {
         let node = Rc::new(RefCell::new(Node::new(value)));
         if self.size == 0 {
             self.tail = Some(Rc::downgrade(&node));
@@ -127,7 +128,7 @@ impl DoublyLinkedList {
         Ok(())
     }
 
-    pub fn add_before(&mut self, seek: u32, value: u32) -> Result<(), String> {
+    pub fn add_before(&mut self, seek: T, value: T) -> Result<(), String> {
         let mut current_opt = self.head.clone();
         while let Some(current_node) = current_opt {
             if current_node.borrow().value == seek {
@@ -154,11 +155,46 @@ impl DoublyLinkedList {
         Err(format!("Value {seek} not found in list"))
     }
 
-    pub fn find_by_index_from_tail(&self, index: usize) -> Option<u32> {
+    pub fn find_by_index_from_tail(&self, index: usize) -> Option<T> {
         let mut current_opt = self.tail.as_ref()?.upgrade();
         for _ in 0..index {
             current_opt = current_opt?.borrow().prev.as_ref()?.upgrade();
         }
         current_opt.map(|node| node.borrow().value)
+    }
+
+    pub fn iter(&self) -> DoublyLinkedListIter<T> {
+        DoublyLinkedListIter {
+            current: self.head.clone(),
+        }
+    }
+}
+
+impl<T> Drop for DoublyLinkedList<T> {
+    fn drop(&mut self) {
+        let mut current = self.head.take();
+        while let Some(node) = current {
+            let next = node.borrow_mut().next.take();
+            current = next;
+        }
+        self.tail = None;
+        self.size = 0;
+    }
+}
+
+struct DoublyLinkedListIter<T> {
+    current: Option<Rc<RefCell<Node<T>>>>,
+}
+
+impl<T: Copy> Iterator for DoublyLinkedListIter<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(node) = self.current.take() {
+            self.current = node.borrow().next.clone();
+            Some(node.borrow().value)
+        } else {
+            None
+        }
     }
 }

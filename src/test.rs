@@ -100,3 +100,17 @@ fn test_add_before() {
     assert_eq!(list.size(), 5);
     assert_eq!(list.head(), Some(10));
 }
+
+#[test]
+fn test_iter(){
+    let mut list: DoublyLinkedList<u32> = DoublyLinkedList::new();
+    list.add_last(5);
+    list.add_last(6);
+    list.add_last(7);
+    list.add_last(8);
+    let mut values = String::new();
+    for val in list.iter(){
+        values.push_str(val.to_string().as_str());
+    }
+    assert_eq!(values, String::from("5678"));
+}
