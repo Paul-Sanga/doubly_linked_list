@@ -182,7 +182,7 @@ impl<T> Drop for DoublyLinkedList<T> {
     }
 }
 
-struct DoublyLinkedListIter<T> {
+pub struct DoublyLinkedListIter<T> {
     current: Option<Rc<RefCell<Node<T>>>>,
 }
 
